@@ -1,0 +1,165 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Marrakech Escapes Design System
+   Theme: Cozy & Authentic Moroccan
+   Colors: Terracotta, Sand, Deep Teal, Gold
+*/
+
+@layer base {
+  :root {
+    /* Core Palette */
+    --background: 35 30% 96%;
+    --foreground: 20 40% 15%;
+
+    --card: 40 25% 98%;
+    --card-foreground: 20 40% 15%;
+
+    --popover: 40 25% 98%;
+    --popover-foreground: 20 40% 15%;
+
+    /* Terracotta - Primary Brand */
+    --primary: 15 70% 50%;
+    --primary-foreground: 40 30% 98%;
+
+    /* Sand - Secondary */
+    --secondary: 38 35% 90%;
+    --secondary-foreground: 20 40% 20%;
+
+    /* Muted Sand */
+    --muted: 35 20% 92%;
+    --muted-foreground: 20 15% 45%;
+
+    /* Deep Teal - Accent */
+    --accent: 180 45% 28%;
+    --accent-foreground: 40 30% 98%;
+
+    --destructive: 0 65% 50%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 35 25% 85%;
+    --input: 35 25% 88%;
+    --ring: 15 70% 50%;
+
+    --radius: 0.75rem;
+
+    /* Custom Colors */
+    --terracotta: 15 70% 50%;
+    --terracotta-light: 15 65% 65%;
+    --terracotta-dark: 15 75% 35%;
+    --sand: 38 35% 90%;
+    --sand-dark: 38 30% 80%;
+    --teal: 180 45% 28%;
+    --teal-light: 180 40% 40%;
+    --gold: 45 80% 50%;
+    --gold-light: 45 75% 65%;
+    --cream: 40 30% 96%;
+    --brown: 20 40% 20%;
+
+    /* Gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(15 70% 50% / 0.9), hsl(20 60% 40% / 0.85));
+    --gradient-gold: linear-gradient(135deg, hsl(45 80% 50%), hsl(35 75% 55%));
+    --gradient-teal: linear-gradient(135deg, hsl(180 45% 28%), hsl(175 40% 35%));
+    --gradient-warm: linear-gradient(180deg, hsl(35 30% 96%), hsl(38 35% 90%));
+
+    /* Shadows */
+    --shadow-soft: 0 4px 20px -4px hsl(20 40% 20% / 0.1);
+    --shadow-card: 0 8px 30px -8px hsl(20 40% 20% / 0.12);
+    --shadow-elevated: 0 20px 50px -15px hsl(20 40% 20% / 0.2);
+
+    /* Sidebar */
+    --sidebar-background: 38 35% 92%;
+    --sidebar-foreground: 20 40% 20%;
+    --sidebar-primary: 15 70% 50%;
+    --sidebar-primary-foreground: 40 30% 98%;
+    --sidebar-accent: 38 30% 85%;
+    --sidebar-accent-foreground: 20 40% 20%;
+    --sidebar-border: 35 25% 82%;
+    --sidebar-ring: 15 70% 50%;
+  }
+
+  .dark {
+    --background: 20 35% 10%;
+    --foreground: 38 30% 92%;
+
+    --card: 20 30% 14%;
+    --card-foreground: 38 30% 92%;
+
+    --popover: 20 30% 14%;
+    --popover-foreground: 38 30% 92%;
+
+    --primary: 15 65% 55%;
+    --primary-foreground: 20 35% 10%;
+
+    --secondary: 20 25% 20%;
+    --secondary-foreground: 38 30% 92%;
+
+    --muted: 20 20% 18%;
+    --muted-foreground: 35 15% 60%;
+
+    --accent: 180 40% 35%;
+    --accent-foreground: 38 30% 95%;
+
+    --destructive: 0 55% 45%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 20 25% 22%;
+    --input: 20 25% 22%;
+    --ring: 15 65% 55%;
+
+    --sidebar-background: 20 30% 12%;
+    --sidebar-foreground: 38 30% 90%;
+    --sidebar-primary: 15 65% 55%;
+    --sidebar-primary-foreground: 20 35% 10%;
+    --sidebar-accent: 20 25% 18%;
+    --sidebar-accent-foreground: 38 30% 90%;
+    --sidebar-border: 20 25% 20%;
+    --sidebar-ring: 15 65% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display;
+  }
+}
+
+@layer utilities {
+  .text-gradient-gold {
+    background: linear-gradient(135deg, hsl(45 80% 50%), hsl(35 75% 55%));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .bg-gradient-hero {
+    background: var(--gradient-hero);
+  }
+
+  .bg-gradient-warm {
+    background: var(--gradient-warm);
+  }
+
+  .shadow-soft {
+    box-shadow: var(--shadow-soft);
+  }
+
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+
+  .shadow-elevated {
+    box-shadow: var(--shadow-elevated);
+  }
+}
