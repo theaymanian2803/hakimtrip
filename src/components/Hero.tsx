@@ -1,16 +1,15 @@
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { MapPin, Compass } from 'lucide-react';
-import heroImage from '@/assets/hero-desert.jpg';
+import { Link } from 'react-router-dom'
+import { Button } from '@/components/ui/button'
+import { MapPin, Compass } from 'lucide-react'
+import heroImage from '@/assets/hero-desert.jpg'
 
 export function Hero() {
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
       {/* Background Image */}
-      <div 
+      <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${heroImage})` }}
-      >
+        style={{ backgroundImage: `url(${heroImage})` }}>
         <div className="absolute inset-0 bg-gradient-to-b from-brown/60 via-brown/40 to-brown/70" />
       </div>
 
@@ -34,39 +33,32 @@ export function Hero() {
 
           {/* Heading */}
           <h1 className="font-display text-5xl md:text-7xl lg:text-8xl text-sand leading-tight">
-            Discover the{' '}
-            <span className="text-gradient-gold">Magic</span>{' '}
-            of Morocco
+            Discover the <span className="text-gradient-gold">Magic</span> of Morocco
           </h1>
 
           {/* Subheading */}
           <p className="text-lg md:text-xl text-sand/90 max-w-2xl mx-auto leading-relaxed">
-            Unforgettable excursions through ancient medinas, golden deserts, 
-            and majestic mountains. Experience authentic Moroccan hospitality 
-            with Marrakech Escapes.
+            Unforgettable excursions through ancient medinas, golden deserts, and majestic
+            mountains. Experience authentic Moroccan hospitality with Marrakech Escapes.
           </p>
 
           {/* CTAs */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
-            <Button 
-              asChild 
-              size="lg" 
-              className="bg-primary hover:bg-terracotta-dark text-primary-foreground px-8 py-6 text-lg rounded-full shadow-elevated transition-all duration-300 hover:scale-105"
-            >
+            <Button
+              asChild
+              size="lg"
+              className="bg-primary hover:bg-terracotta-dark text-primary-foreground px-8 py-6 text-lg rounded-full shadow-elevated transition-all duration-300 hover:scale-105">
               <Link to="/excursions">
                 <Compass className="w-5 h-5 mr-2" />
                 Explore Excursions
               </Link>
             </Button>
-            <Button 
-              asChild 
-              variant="outline" 
+            <Button
+              asChild
+              variant="outline"
               size="lg"
-              className="border-sand/50 text-sand hover:bg-sand/10 px-8 py-6 text-lg rounded-full transition-all duration-300"
-            >
-              <Link to="/#about">
-                Learn More
-              </Link>
+              className="bg-primary hover:bg-terracotta-dark text-primary-foreground px-8 py-6 text-lg rounded-full shadow-elevated transition-all duration-300 hover:scale-105">
+              <Link to="/#about">Learn More</Link>
             </Button>
           </div>
         </div>
@@ -79,5 +71,5 @@ export function Hero() {
         </div>
       </div>
     </section>
-  );
+  )
 }
