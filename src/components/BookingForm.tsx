@@ -5,9 +5,22 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Calendar, Users, Send, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { openWhatsApp } from '@/lib/site';
 
 interface BookingFormProps {
   excursionTitle: string;
+}
+
+function buildBookingMessage(formData: FormData, excursionTitle: string): string {
+  const fields = [
+    `Excursion: ${excursionTitle}`,
+    `Name: ${formData.get('name') || ''}`,
+    `Email: ${formData.get('email') || ''}`,
+    `Preferred Date: ${formData.get('date') || ''}`,
+    `Number of People: ${formData.get('people') || ''}`,
+    `Special Requests: ${formData.get('requests') || 'None'}`,
+  ];
+  return `New Booking Request\n\n${fields.join('\n')}`;
 }
 
 export function BookingForm({ excursionTitle }: BookingFormProps) {
@@ -20,6 +33,8 @@ export function BookingForm({ excursionTitle }: BookingFormProps) {
 
     const form = e.currentTarget;
     const formData = new FormData(form);
+
+    openWhatsApp(buildBookingMessage(formData, excursionTitle));
 
     try {
       const response = await fetch('https://formspree.io/f/xojjeavp', {

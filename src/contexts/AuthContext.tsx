@@ -1,15 +1,13 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { verifyAdminCredentials } from '@/lib/auth';
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  login: (email: string, password: string) => boolean;
+  login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-const ADMIN_EMAIL = 'admin@site.com';
-const ADMIN_PASSWORD = '123456';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -17,13 +15,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return sessionStorage.getItem('admin_authenticated') === 'true';
   });
 
-  const login = (email: string, password: string): boolean => {
-    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+  const login = async (email: string, password: string): Promise<boolean> => {
+    const valid = await verifyAdminCredentials(email, password);
+    if (valid) {
       setIsAuthenticated(true);
       sessionStorage.setItem('admin_authenticated', 'true');
-      return true;
     }
-    return false;
+    return valid;
   };
 
   const logout = () => {

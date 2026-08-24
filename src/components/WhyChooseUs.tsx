@@ -23,37 +23,45 @@ const features = [
   },
 ];
 
+const stats = [
+  { value: '10+', label: 'Years Experience' },
+  { value: '5,000+', label: 'Happy Travelers' },
+  { value: '50+', label: 'Unique Tours' },
+  { value: '4.9', label: 'Average Rating' },
+];
+
 export function WhyChooseUs() {
   return (
     <section id="about" className="py-24 bg-card">
       <div className="container mx-auto px-4">
         {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-16">
+        <div className="text-center max-w-2xl mx-auto mb-20">
           <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
             Why Choose{' '}
             <span className="text-primary">Marrakech Escapes</span>
           </h2>
           <p className="text-muted-foreground text-lg leading-relaxed">
-            With over a decade of experience, we've perfected the art of creating 
+            With over a decade of experience, we've perfected the art of creating
             unforgettable Moroccan adventures.
           </p>
         </div>
 
         {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-10 gap-y-14">
           {features.map((feature, index) => (
             <div
               key={feature.title}
-              className="group text-center p-8 rounded-2xl bg-background hover:bg-secondary transition-all duration-300 shadow-soft hover:shadow-card animate-fade-in"
+              className="group text-center animate-fade-in"
               style={{ animationDelay: `${index * 100}ms` }}
             >
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 text-primary mb-6 group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
-                <feature.icon className="w-8 h-8" />
+              <div className="inline-flex items-center justify-center w-14 h-14 rounded-full border border-primary/20 bg-primary/5 text-primary mb-6 group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-all duration-300">
+                <feature.icon className="w-6 h-6" strokeWidth={1.5} />
               </div>
-              <h3 className="font-display text-xl font-semibold text-foreground mb-3">
+              <div className="w-8 h-px bg-gold mx-auto mb-4 group-hover:w-14 transition-all duration-300" />
+              <h3 className="font-display text-lg font-semibold text-foreground mb-3">
                 {feature.title}
               </h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">
+              <p className="text-muted-foreground text-sm leading-relaxed max-w-xs mx-auto">
                 {feature.description}
               </p>
             </div>
@@ -61,19 +69,25 @@ export function WhyChooseUs() {
         </div>
 
         {/* Stats Section */}
-        <div className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-8 p-8 rounded-3xl bg-primary text-primary-foreground">
-          {[
-            { value: '10+', label: 'Years Experience' },
-            { value: '5,000+', label: 'Happy Travelers' },
-            { value: '50+', label: 'Unique Tours' },
-            { value: '4.9', label: 'Average Rating' },
-          ].map((stat) => (
-            <div key={stat.label} className="text-center">
-              <div className="font-display text-4xl md:text-5xl font-bold mb-2">
+        <div className="relative mt-24 grid grid-cols-2 lg:grid-cols-4 gap-y-12 p-10 md:p-14 rounded-3xl bg-primary overflow-hidden">
+          {/* Decorative rings */}
+          <div className="absolute -top-20 -right-16 w-56 h-56 rounded-full border border-primary-foreground/10 pointer-events-none" />
+          <div className="absolute -bottom-24 -left-12 w-48 h-48 rounded-full border border-primary-foreground/10 pointer-events-none" />
+
+          {stats.map((stat, index) => (
+            <div
+              key={stat.label}
+              className={`relative text-center px-6 ${index > 0 ? 'lg:border-l lg:border-primary-foreground/15' : ''}`}
+            >
+              <div className="font-display text-4xl md:text-5xl font-bold text-primary-foreground">
                 {stat.value}
               </div>
-              <div className="text-primary-foreground/80 text-sm">
-                {stat.label}
+              <div className="mt-3 flex items-center justify-center gap-2">
+                <span className="w-4 h-px bg-gold" />
+                <span className="text-primary-foreground/85 text-sm tracking-wide">
+                  {stat.label}
+                </span>
+                <span className="w-4 h-px bg-gold" />
               </div>
             </div>
           ))}

@@ -10,9 +10,22 @@ import { ArrowLeft, MapPin, Clock, Users, Star, CheckCircle } from 'lucide-react
 
 export default function ExcursionDetails() {
   const { id } = useParams<{ id: string }>();
-  const { getExcursion } = useExcursions();
+  const { getExcursion, isLoading } = useExcursions();
 
   const excursion = id ? getExcursion(id) : undefined;
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="container mx-auto px-4 py-32 text-center">
+          <div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-muted-foreground">Loading excursion...</p>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   if (!excursion) {
     return (

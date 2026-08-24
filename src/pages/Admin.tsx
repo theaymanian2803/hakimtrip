@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useExcursions } from '@/contexts/ExcursionsContext';
-import { ExcursionInput } from '@/types/excursion';
+import { Excursion, ExcursionInput } from '@/types/excursion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -16,7 +16,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue 
 } from '@/components/ui/select';
 import { 
-  Compass, LogOut, Plus, Trash2, Image as ImageIcon,
+  Compass, LogOut, Plus, Trash2, Image as ImageIcon, Pencil,
   DollarSign, Tag, X
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -25,10 +25,11 @@ const categories = ['Desert', 'Mountains', 'Coastal', 'City', 'Nature', 'Culinar
 
 export default function Admin() {
   const { logout } = useAuth();
-  const { excursions, addExcursion, deleteExcursion } = useExcursions();
+  const { excursions, addExcursion, updateExcursion, deleteExcursion } = useExcursions();
   const navigate = useNavigate();
 
   const [isAddingNew, setIsAddingNew] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [newImageUrl, setNewImageUrl] = useState('');
   const [formData, setFormData] = useState<ExcursionInput>({
     title: '',
@@ -38,6 +39,13 @@ export default function Admin() {
     imageUrl: '',
     images: [],
   });
+
+  const resetForm = () => {
+    setFormData({ title: '', price: 0, description: '', category: '', imageUrl: '', images: [] });
+    setNewImageUrl('');
+    setEditingId(null);
+    setIsAddingNew(false);
+  };
 
   const handleLogout = () => {
     logout();
@@ -63,7 +71,7 @@ export default function Admin() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.title || !formData.price || !formData.description || !formData.category || !formData.imageUrl) {
@@ -71,16 +79,43 @@ export default function Admin() {
       return;
     }
 
-    addExcursion(formData);
-    toast.success('Excursion added successfully!');
-    setFormData({ title: '', price: 0, description: '', category: '', imageUrl: '', images: [] });
-    setNewImageUrl('');
-    setIsAddingNew(false);
+    try {
+      if (editingId) {
+        await updateExcursion(editingId, formData);
+        toast.success('Excursion updated successfully!');
+      } else {
+        await addExcursion(formData);
+        toast.success('Excursion added successfully!');
+      }
+      resetForm();
+    } catch {
+      toast.error(editingId ? 'Failed to update excursion. Please try again.' : 'Failed to add excursion. Please try again.');
+    }
   };
 
-  const handleDelete = (id: string, title: string) => {
-    deleteExcursion(id);
-    toast.success(`"${title}" deleted successfully`);
+  const handleEdit = (excursion: Excursion) => {
+    setFormData({
+      title: excursion.title,
+      price: excursion.price,
+      description: excursion.description,
+      category: excursion.category,
+      imageUrl: excursion.imageUrl,
+      images: excursion.images || [],
+    });
+    setEditingId(excursion.id);
+    setIsAddingNew(true);
+    requestAnimationFrame(() => {
+      document.getElementById('excursion-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  };
+
+  const handleDelete = async (id: string, title: string) => {
+    try {
+      await deleteExcursion(id);
+      toast.success(`"${title}" deleted successfully`);
+    } catch {
+      toast.error(`Failed to delete "${title}". Please try again.`);
+    }
   };
 
   return (
@@ -163,8 +198,10 @@ export default function Admin() {
           <CardContent>
             {/* Add New Form */}
             {isAddingNew && (
-              <div className="mb-8 p-6 bg-secondary rounded-2xl animate-fade-in">
-                <h3 className="font-display text-lg font-semibold mb-4">Add New Excursion</h3>
+              <div id="excursion-form" className="mb-8 p-6 bg-secondary rounded-2xl animate-fade-in">
+                <h3 className="font-display text-lg font-semibold mb-4">
+                  {editingId ? 'Edit Excursion' : 'Add New Excursion'}
+                </h3>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
@@ -280,10 +317,19 @@ export default function Admin() {
 
                   <div className="flex gap-4">
                     <Button type="submit" className="bg-primary hover:bg-terracotta-dark text-primary-foreground">
-                      <Plus className="w-4 h-4 mr-2" />
-                      Add Excursion
+                      {editingId ? (
+                        <>
+                          <Pencil className="w-4 h-4 mr-2" />
+                          Save Changes
+                        </>
+                      ) : (
+                        <>
+                          <Plus className="w-4 h-4 mr-2" />
+                          Add Excursion
+                        </>
+                      )}
                     </Button>
-                    <Button type="button" variant="outline" onClick={() => setIsAddingNew(false)}>
+                    <Button type="button" variant="outline" onClick={resetForm}>
                       Cancel
                     </Button>
                   </div>
@@ -312,31 +358,41 @@ export default function Admin() {
                       {excursion.description.slice(0, 100)}...
                     </p>
                   </div>
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive hover:bg-destructive/10">
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Delete Excursion</DialogTitle>
-                        <DialogDescription>
-                          Are you sure you want to delete "{excursion.title}"? This action cannot be undone.
-                        </DialogDescription>
-                      </DialogHeader>
-                      <DialogFooter>
-                        <DialogClose asChild>
-                          <Button variant="outline">Cancel</Button>
-                        </DialogClose>
-                        <DialogClose asChild>
-                          <Button variant="destructive" onClick={() => handleDelete(excursion.id, excursion.title)}>
-                            Delete
-                          </Button>
-                        </DialogClose>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-primary hover:text-primary hover:bg-primary/10"
+                      onClick={() => handleEdit(excursion)}
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </Button>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive hover:bg-destructive/10">
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Delete Excursion</DialogTitle>
+                          <DialogDescription>
+                            Are you sure you want to delete "{excursion.title}"? This action cannot be undone.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <DialogFooter>
+                          <DialogClose asChild>
+                            <Button variant="outline">Cancel</Button>
+                          </DialogClose>
+                          <DialogClose asChild>
+                            <Button variant="destructive" onClick={() => handleDelete(excursion.id, excursion.title)}>
+                              Delete
+                            </Button>
+                          </DialogClose>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
                 </div>
               ))}
 

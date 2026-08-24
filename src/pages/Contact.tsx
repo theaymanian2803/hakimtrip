@@ -8,6 +8,18 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Phone, Mail, MapPin, Clock, Send } from 'lucide-react';
 import { toast } from 'sonner';
+import { openWhatsApp, SITE_PHONE_DISPLAY, SITE_PHONE_TEL, SITE_EMAIL } from '@/lib/site';
+
+function buildContactMessage(formData: FormData): string {
+  const fields = [
+    `Name: ${formData.get('name') || ''}`,
+    `Email: ${formData.get('email') || ''}`,
+    `Phone: ${formData.get('phone') || 'Not provided'}`,
+    `Subject: ${formData.get('subject') || ''}`,
+    `Message: ${formData.get('message') || ''}`,
+  ];
+  return `New Contact Message\n\n${fields.join('\n')}`;
+}
 
 export default function Contact() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -18,6 +30,8 @@ export default function Contact() {
 
     const form = e.currentTarget;
     const formData = new FormData(form);
+
+    openWhatsApp(buildContactMessage(formData));
 
     try {
       const response = await fetch('https://formspree.io/f/xojjeavp', {
@@ -78,8 +92,8 @@ export default function Contact() {
                     </div>
                     <div>
                       <h3 className="font-display font-semibold text-foreground mb-1">Reach Us By Phone</h3>
-                      <a href="tel:+212768188817" className="text-muted-foreground text-sm hover:text-primary transition-colors">
-                        +212 768-188817
+                      <a href={`tel:${SITE_PHONE_TEL}`} className="text-muted-foreground text-sm hover:text-primary transition-colors">
+                        {SITE_PHONE_DISPLAY}
                       </a>
                     </div>
                   </div>
@@ -90,8 +104,8 @@ export default function Contact() {
                     </div>
                     <div>
                       <h3 className="font-display font-semibold text-foreground mb-1">Email</h3>
-                      <a href="mailto:contact@moroccotourcravers.com" className="text-muted-foreground text-sm hover:text-primary transition-colors">
-                        contact@moroccotourcravers.com
+                      <a href={`mailto:${SITE_EMAIL}`} className="text-muted-foreground text-sm hover:text-primary transition-colors">
+                        {SITE_EMAIL}
                       </a>
                     </div>
                   </div>

@@ -75,7 +75,7 @@ export default function AdminLogin() {
                   <Input
                     id="email"
                     type="email"
-                    placeholder="admin@site.com"
+                    placeholder="you@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -117,10 +117,6 @@ export default function AdminLogin() {
             </form>
           </CardContent>
         </Card>
-
-        <p className="text-center text-muted-foreground text-sm mt-6">
-          Demo credentials: admin@site.com / 123456
-        </p>
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { MapPin, Phone, Mail, Instagram, Facebook, Twitter } from 'lucide-react';
+import { SITE_PHONE_DISPLAY, SITE_EMAIL } from '@/lib/site';
 
 export function Footer() {
   return (
@@ -94,11 +95,11 @@ export function Footer() {
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="w-5 h-5 text-primary flex-shrink-0" />
-                <span className="text-sand/70 text-sm">+212 768-188817</span>
+                <span className="text-sand/70 text-sm">{SITE_PHONE_DISPLAY}</span>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-primary flex-shrink-0" />
-                <span className="text-sand/70 text-sm">contact@moroccotourcravers.com</span>
+                <span className="text-sand/70 text-sm">{SITE_EMAIL}</span>
               </li>
             </ul>
           </div>
