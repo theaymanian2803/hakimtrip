@@ -8,7 +8,6 @@ const testimonials = [
     headline: 'The night under the stars was pure magic',
     review:
       'Our guide Ali made the camel trek feel effortless, and the camp beneath the Milky Way was unreal. Every detail — the tea, the fire, the stories — was perfect. Worth every penny.',
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&crop=faces&auto=format',
   },
   {
     name: 'Lucas Moreau',
@@ -17,7 +16,6 @@ const testimonials = [
     headline: 'The mountains came alive with Brahim',
     review:
       "Perfectly organised from pickup to drop-off. Brahim's stories about Berber village life made the Atlas feel personal, and the mint tea on that terrace — best I've ever had.",
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=faces&auto=format',
   },
   {
     name: 'Sofia Ricci',
@@ -26,7 +24,6 @@ const testimonials = [
     headline: 'The perfect escape from the medina',
     review:
       'Fresh fish by the port, sea breeze in our hair, and a guide who knew every corner and craftsman by name. We left with photos, spices, and one of the best days of our trip.',
-    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop&crop=faces&auto=format',
   },
   {
     name: 'James Whitfield',
@@ -35,7 +32,6 @@ const testimonials = [
     headline: 'I finally saw the real Marrakech',
     review:
       "This was my third visit, and I'd missed all of it until now. Hidden riads, a rooftop with the best view in the city, and the street food spot only locals know. Book it first.",
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=faces&auto=format',
   },
   {
     name: 'Priya Sharma',
@@ -44,7 +40,6 @@ const testimonials = [
     headline: 'The highlight of our honeymoon',
     review:
       'Learning tagine with Fatima in her own kitchen was warm, fun, and delicious. We cook her recipes at home every week now — and we always think of Marrakech.',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop&crop=faces&auto=format',
   },
   {
     name: 'Michael Weber',
@@ -53,7 +48,6 @@ const testimonials = [
     headline: 'The little touches made it unforgettable',
     review:
       'The falls are stunning, but it was the details — fresh oranges, a quiet boat ride to the base, monkeys everywhere — that made this trip unforgettable. Flawless organisation.',
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop&crop=faces&auto=format',
   },
 ];
 
@@ -108,20 +102,12 @@ export function Testimonials() {
                 "{testimonial.review}"
               </blockquote>
 
-              <figcaption className="flex items-center gap-3 mt-6 pt-5 border-t border-border/60">
-                <img
-                  src={testimonial.avatar}
-                  alt={testimonial.name}
-                  loading="lazy"
-                  className="w-11 h-11 rounded-full object-cover ring-2 ring-gold/40"
-                />
-                <div>
-                  <div className="font-semibold text-foreground text-sm">
-                    {testimonial.name}
-                  </div>
-                  <div className="text-muted-foreground text-xs">
-                    {testimonial.trip} · {testimonial.country}
-                  </div>
+              <figcaption className="mt-6 pt-5 border-t border-border/60">
+                <div className="font-semibold text-foreground text-sm">
+                  {testimonial.name}
+                </div>
+                <div className="text-muted-foreground text-xs">
+                  {testimonial.trip} · {testimonial.country}
                 </div>
               </figcaption>
             </figure>
