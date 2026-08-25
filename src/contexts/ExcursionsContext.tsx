@@ -7,6 +7,7 @@ import {
   updateExcursionInDb,
   deleteExcursionFromDb,
   seedDefaultExcursions,
+  renameExcursionsCategoryInDb,
   isTursoConfigured,
 } from '@/lib/turso';
 
@@ -17,6 +18,7 @@ interface ExcursionsContextType {
   addExcursion: (input: ExcursionInput) => Promise<Excursion>;
   updateExcursion: (id: string, input: ExcursionInput) => Promise<void>;
   deleteExcursion: (id: string) => Promise<void>;
+  renameCategory: (oldName: string, newName: string) => Promise<void>;
   getExcursion: (id: string) => Excursion | undefined;
 }
 
@@ -96,12 +98,19 @@ export function ExcursionsProvider({ children }: { children: ReactNode }) {
     setExcursions(prev => prev.filter(exc => exc.id !== id));
   }, []);
 
+  const renameCategory = useCallback(async (oldName: string, newName: string): Promise<void> => {
+    await renameExcursionsCategoryInDb(oldName, newName);
+    setExcursions(prev =>
+      prev.map(exc => (exc.category === oldName ? { ...exc, category: newName } : exc))
+    );
+  }, []);
+
   const getExcursion = useCallback((id: string): Excursion | undefined => {
     return excursions.find(exc => exc.id === id);
   }, [excursions]);
 
   return (
-    <ExcursionsContext.Provider value={{ excursions, isLoading, error, addExcursion, updateExcursion, deleteExcursion, getExcursion }}>
+    <ExcursionsContext.Provider value={{ excursions, isLoading, error, addExcursion, updateExcursion, deleteExcursion, renameCategory, getExcursion }}>
       {children}
     </ExcursionsContext.Provider>
   );

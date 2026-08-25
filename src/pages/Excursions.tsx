@@ -1,5 +1,6 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useMemo, useRef, useState, useEffect } from 'react';
 import { useExcursions } from '@/contexts/ExcursionsContext';
+import { useExcursionTypes } from '@/contexts/ExcursionTypesContext';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { ExcursionCard } from '@/components/ExcursionCard';
@@ -9,16 +10,17 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { SlidersHorizontal, Compass } from 'lucide-react';
 
-const categories = ['Desert', 'Mountains', 'Coastal', 'City', 'Nature', 'Culinary', 'Cultural', 'Adventure'];
 const ITEMS_PER_PAGE = 9;
 
 export default function Excursions() {
   const { excursions } = useExcursions();
+  const { excursionTypes } = useExcursionTypes();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 500]);
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const pricesInitialized = useRef(false);
 
   const { minPrice, maxPrice } = useMemo(() => {
     if (excursions.length === 0) return { minPrice: 0, maxPrice: 500 };
@@ -26,10 +28,19 @@ export default function Excursions() {
     return { minPrice: Math.min(...prices), maxPrice: Math.max(...prices) };
   }, [excursions]);
 
+  // Initialize the price range from the actual excursion prices once they load
+  useEffect(() => {
+    if (pricesInitialized.current) return;
+    if (excursions.length > 0) {
+      pricesInitialized.current = true;
+      setPriceRange([minPrice, maxPrice]);
+    }
+  }, [excursions, minPrice, maxPrice]);
+
   const availableCategories = useMemo(() => {
     const cats = new Set(excursions.map(e => e.category));
-    return categories.filter(c => cats.has(c));
-  }, [excursions]);
+    return excursionTypes.map(t => t.name).filter(c => cats.has(c));
+  }, [excursions, excursionTypes]);
 
   const categoryCounts = useMemo(() => {
     const counts: Record<string, number> = {};

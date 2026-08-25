@@ -1,5 +1,6 @@
 import { createClient, type Client } from '@libsql/client/web';
 import type { Excursion, ExcursionInput } from '@/types/excursion';
+import type { ExcursionType, ExcursionTypeInput } from '@/types/excursionType';
 
 const url = import.meta.env.VITE_TURSO_URL;
 const authToken = import.meta.env.VITE_TURSO_AUTH_TOKEN;
@@ -182,6 +183,74 @@ export async function updateExcursionInDb(id: string, input: ExcursionInput): Pr
 export async function deleteExcursionFromDb(id: string): Promise<void> {
   await getTursoClient().execute({
     sql: 'DELETE FROM excursions WHERE id = ?',
+    args: [id],
+  });
+}
+
+const CREATE_EXCURSION_TYPES_TABLE = `
+  CREATE TABLE IF NOT EXISTS excursion_types (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL UNIQUE,
+    createdAt TEXT NOT NULL
+  )
+`;
+
+export async function ensureExcursionTypesTable(): Promise<void> {
+  await getTursoClient().execute(CREATE_EXCURSION_TYPES_TABLE);
+}
+
+export const defaultExcursionTypes: ExcursionType[] = [
+  'Desert', 'Mountains', 'Coastal', 'City', 'Nature', 'Culinary', 'Cultural', 'Adventure',
+].map((name, i) => ({ id: String(i + 1), name, createdAt: new Date().toISOString() }));
+
+export async function seedDefaultExcursionTypes(): Promise<void> {
+  for (const type of defaultExcursionTypes) {
+    await insertExcursionType(type);
+  }
+}
+
+function rowToExcursionType(row: Record<string, unknown>): ExcursionType {
+  return {
+    id: String(row.id),
+    name: String(row.name),
+    createdAt: String(row.createdAt),
+  };
+}
+
+const SELECT_ALL_TYPES = 'SELECT * FROM excursion_types ORDER BY name ASC';
+
+export async function fetchExcursionTypes(): Promise<ExcursionType[]> {
+  const result = await getTursoClient().execute(SELECT_ALL_TYPES);
+  return result.rows.map(rowToExcursionType);
+}
+
+export async function insertExcursionType(type: ExcursionType): Promise<void> {
+  await getTursoClient().execute({
+    sql: `
+      INSERT INTO excursion_types (id, name, createdAt)
+      VALUES (?, ?, ?)
+    `,
+    args: [type.id, type.name, type.createdAt],
+  });
+}
+
+export async function updateExcursionTypeInDb(id: string, input: ExcursionTypeInput): Promise<void> {
+  await getTursoClient().execute({
+    sql: 'UPDATE excursion_types SET name = ? WHERE id = ?',
+    args: [input.name, id],
+  });
+}
+
+export async function renameExcursionsCategoryInDb(oldName: string, newName: string): Promise<void> {
+  await getTursoClient().execute({
+    sql: 'UPDATE excursions SET category = ? WHERE category = ?',
+    args: [newName, oldName],
+  });
+}
+
+export async function deleteExcursionTypeFromDb(id: string): Promise<void> {
+  await getTursoClient().execute({
+    sql: 'DELETE FROM excursion_types WHERE id = ?',
     args: [id],
   });
 }

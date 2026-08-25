@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ExcursionsProvider } from "@/contexts/ExcursionsContext";
+import { ExcursionTypesProvider } from "@/contexts/ExcursionTypesContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AdminRoute } from "@/components/AdminRoute";
 import Index from "./pages/Index";
@@ -21,7 +22,8 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <ExcursionsProvider>
-        <TooltipProvider>
+        <ExcursionTypesProvider>
+          <TooltipProvider>
           <Toaster />
           <Sonner />
           <BrowserRouter>
@@ -44,7 +46,8 @@ const App = () => (
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
-        </TooltipProvider>
+</TooltipProvider>
+        </ExcursionTypesProvider>
       </ExcursionsProvider>
     </AuthProvider>
   </QueryClientProvider>

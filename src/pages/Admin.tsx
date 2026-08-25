@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useExcursions } from '@/contexts/ExcursionsContext';
+import { useExcursionTypes } from '@/contexts/ExcursionTypesContext';
 import { Excursion, ExcursionInput } from '@/types/excursion';
+import { ExcursionType } from '@/types/excursionType';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -21,11 +23,10 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 
-const categories = ['Desert', 'Mountains', 'Coastal', 'City', 'Nature', 'Culinary', 'Cultural', 'Adventure'];
-
 export default function Admin() {
   const { logout } = useAuth();
-  const { excursions, addExcursion, updateExcursion, deleteExcursion } = useExcursions();
+  const { excursions, addExcursion, updateExcursion, deleteExcursion, renameCategory } = useExcursions();
+  const { excursionTypes, addExcursionType, updateExcursionType, deleteExcursionType } = useExcursionTypes();
   const navigate = useNavigate();
 
   const [isAddingNew, setIsAddingNew] = useState(false);
@@ -39,6 +40,17 @@ export default function Admin() {
     imageUrl: '',
     images: [],
   });
+
+  const [newTypeName, setNewTypeName] = useState('');
+  const [editingTypeId, setEditingTypeId] = useState<string | null>(null);
+  const [editingTypeName, setEditingTypeName] = useState('');
+  const [typeToDelete, setTypeToDelete] = useState<ExcursionType | null>(null);
+
+  const excursionTypeCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    excursions.forEach(e => { counts[e.category] = (counts[e.category] || 0) + 1; });
+    return counts;
+  }, [excursions]);
 
   const resetForm = () => {
     setFormData({ title: '', price: 0, description: '', category: '', imageUrl: '', images: [] });
@@ -118,6 +130,63 @@ export default function Admin() {
     }
   };
 
+  const handleAddType = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const name = newTypeName.trim();
+    if (!name) return;
+    if (excursionTypes.some(t => t.name.toLowerCase() === name.toLowerCase())) {
+      toast.error(`Type "${name}" already exists`);
+      return;
+    }
+    try {
+      await addExcursionType({ name });
+      toast.success(`Type "${name}" added successfully!`);
+      setNewTypeName('');
+    } catch {
+      toast.error('Failed to add type. Please try again.');
+    }
+  };
+
+  const handleSaveTypeRename = async (id: string, oldName: string) => {
+    const name = editingTypeName.trim();
+    if (!name || name === oldName) {
+      setEditingTypeId(null);
+      return;
+    }
+    if (excursionTypes.some(t => t.id !== id && t.name.toLowerCase() === name.toLowerCase())) {
+      toast.error(`Type "${name}" already exists`);
+      return;
+    }
+    try {
+      await updateExcursionType(id, { name });
+      await renameCategory(oldName, name);
+      toast.success(`Type renamed to "${name}"`);
+      setEditingTypeId(null);
+    } catch {
+      toast.error('Failed to rename type. Please try again.');
+    }
+  };
+
+  const handleDeleteTypeClick = (type: ExcursionType) => {
+    const count = excursionTypeCounts[type.name] || 0;
+    if (count > 0) {
+      toast.error(`Cannot delete "${type.name}" — it is used by ${count} excursion${count === 1 ? '' : 's'}`);
+      return;
+    }
+    setTypeToDelete(type);
+  };
+
+  const handleDeleteType = async (type: ExcursionType) => {
+    try {
+      await deleteExcursionType(type.id);
+      toast.success(`Type "${type.name}" deleted successfully`);
+    } catch {
+      toast.error(`Failed to delete type "${type.name}". Please try again.`);
+    } finally {
+      setTypeToDelete(null);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-warm">
       {/* Header */}
@@ -158,9 +227,9 @@ export default function Admin() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-muted-foreground text-sm">Categories</p>
+                  <p className="text-muted-foreground text-sm">Types</p>
                   <p className="font-display text-3xl font-bold text-foreground">
-                    {new Set(excursions.map(e => e.category)).size}
+                    {excursionTypes.length}
                   </p>
                 </div>
                 <div className="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center">
@@ -185,6 +254,85 @@ export default function Admin() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Excursion Types */}
+        <Card className="shadow-card border-0 mb-8">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="font-display text-2xl">Excursion Types</CardTitle>
+            <span className="text-sm text-muted-foreground">{excursionTypes.length} types</span>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleAddType} className="flex gap-2 mb-6">
+              <Input
+                value={newTypeName}
+                onChange={(e) => setNewTypeName(e.target.value)}
+                placeholder="New type name, e.g. Desert"
+                className="flex-1"
+              />
+              <Button type="submit" className="bg-primary hover:bg-terracotta-dark text-primary-foreground rounded-xl">
+                <Plus className="w-4 h-4 mr-2" />
+                Add Type
+              </Button>
+            </form>
+
+            <div className="space-y-2">
+              {excursionTypes.map((type) => (
+                <div key={type.id} className="flex items-center gap-3 p-3 bg-background rounded-xl">
+                  {editingTypeId === type.id ? (
+                    <>
+                      <Input
+                        value={editingTypeName}
+                        onChange={(e) => setEditingTypeName(e.target.value)}
+                        className="flex-1"
+                        autoFocus
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') { e.preventDefault(); handleSaveTypeRename(type.id, type.name); }
+                          if (e.key === 'Escape') setEditingTypeId(null);
+                        }}
+                      />
+                      <Button size="sm" onClick={() => handleSaveTypeRename(type.id, type.name)}>
+                        Save
+                      </Button>
+                      <Button size="sm" variant="ghost" onClick={() => setEditingTypeId(null)}>
+                        Cancel
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Tag className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                      <span className="font-medium flex-1 truncate">{type.name}</span>
+                      <span className="text-xs text-muted-foreground flex-shrink-0">
+                        {excursionTypeCounts[type.name] || 0} excursion{excursionTypeCounts[type.name] === 1 ? '' : 's'}
+                      </span>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-primary hover:text-primary hover:bg-primary/10"
+                        onClick={() => { setEditingTypeId(type.id); setEditingTypeName(type.name); }}
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                        onClick={() => handleDeleteTypeClick(type)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </>
+                  )}
+                </div>
+              ))}
+
+              {excursionTypes.length === 0 && (
+                <p className="text-muted-foreground text-sm text-center py-6">
+                  No types yet. Add your first one!
+                </p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Excursions List */}
         <Card className="shadow-card border-0">
@@ -237,8 +385,8 @@ export default function Admin() {
                     <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
                       <SelectTrigger><SelectValue placeholder="Select a category" /></SelectTrigger>
                       <SelectContent>
-                        {categories.map((cat) => (
-                          <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                        {excursionTypes.map((type) => (
+                          <SelectItem key={type.id} value={type.name}>{type.name}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -405,6 +553,26 @@ export default function Admin() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Delete Type Confirmation */}
+        <Dialog open={typeToDelete !== null} onOpenChange={(open) => !open && setTypeToDelete(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Delete Excursion Type</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to delete "{typeToDelete?.name}"? This action cannot be undone.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setTypeToDelete(null)}>
+                Cancel
+              </Button>
+              <Button variant="destructive" onClick={() => typeToDelete && handleDeleteType(typeToDelete)}>
+                Delete
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );
